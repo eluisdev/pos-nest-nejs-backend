@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { Category } from '../categories/entities/category.entity';
+import { TransactionContents } from 'src/transactions/entities/transaction.entity';
 
 @Injectable()
 export class ProductsService {
@@ -90,8 +91,25 @@ export class ProductsService {
   }
 
   async remove(id: number) {
-    const product = await this.findOne(id);
-    await this.productRepository.remove(product);
+    await this.productRepository.manager.transaction(
+      async (productEntityManager) => {
+        const product = await this.findOne(id);
+        const transactionContents = await productEntityManager.find(
+          TransactionContents,
+          {
+            where: {
+              product: {
+                id: product.id,
+              },
+            },
+          },
+        );
+        for (const tc of transactionContents) {
+          await productEntityManager.remove(tc);
+        }
+        await productEntityManager.remove(product);
+      },
+    );
     return { message: 'Producto eliminado' };
   }
 }
