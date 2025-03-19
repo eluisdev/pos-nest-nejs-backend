@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 // import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +15,7 @@ import { Between, FindManyOptions, Repository } from 'typeorm';
 import { Product } from '../products/entities/product.entity';
 import { endOfDay, isValid, parseISO, startOfDay } from 'date-fns';
 import { CouponsService } from '../coupons/coupons.service';
-import { User } from 'src/user/entities/user.entity';
+import { User, UserPeticion } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TransactionsService {
@@ -29,13 +30,15 @@ export class TransactionsService {
     private readonly couponRepository: CouponsService,
   ) {}
 
-  async create(createTransactionDto: CreateTransactionDto) {
+  async create(
+    createTransactionDto: CreateTransactionDto,
+    userPeticion: UserPeticion,
+  ) {
     await this.productRepository.manager.transaction(
       async (transactionEntityManager) => {
-        //TODO: Revisar codigo
         const transaction = new Transaction();
         const user = await this.userRepositoy.findOne({
-          where: { id: +createTransactionDto.userId },
+          where: { id: userPeticion.id },
         });
         transaction.user = user;
         const total = createTransactionDto.contents.reduce(

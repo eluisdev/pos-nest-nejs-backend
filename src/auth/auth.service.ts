@@ -13,22 +13,23 @@ export class AuthService {
 
   async signIn(email: string, pass: string) {
     const user = await this.usersService.findOne(email);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     const isMatch = await bcrypt.compare(pass, user.password);
     if (!isMatch) {
       throw new NotFoundException('Contraseña incorrecta');
     }
 
-    const payload = { userId: user.id, username: user.name, rol: user.rol };
-    const { rol } = user;
+    const payload = { id: user.id };
     return {
       token: await this.jwtService.signAsync(payload),
-      rol,
     };
   }
 
   async register(register: registerDto) {
     const user = await this.usersService.create(register);
-    const payload = { userId: user.id, username: user.name, rol: user.rol };
+    const payload = { id: user.id };
     return {
       token: await this.jwtService.signAsync(payload),
     };

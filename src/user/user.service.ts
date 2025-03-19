@@ -43,4 +43,12 @@ export class UserService {
     }
     return user;
   }
+
+  async findById(id: number) {
+    const [user] = await this.userRepository.find({
+      where: { id },
+      select: ['id', 'email', 'name', 'rol'],
+    });
+    return user;
+  }
 }

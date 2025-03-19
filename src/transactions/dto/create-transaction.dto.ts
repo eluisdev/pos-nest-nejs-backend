@@ -34,6 +34,4 @@ export class CreateTransactionDto {
   @ValidateNested()
   @Type(() => TransactionContentsDto)
   contents: TransactionContentsDto[];
-  @IsNotEmpty({ message: 'El id del usuario no puede ir vacio' })
-  userId: string;
 }

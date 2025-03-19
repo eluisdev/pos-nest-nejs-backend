@@ -7,19 +7,29 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 // import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { IdValidationPipe } from '../common/pipes/id-validation/id-validation.pipe';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Request } from 'express';
+import { User, UserPeticion } from 'src/user/entities/user.entity';
+import { UserDecorator } from 'src/decorators/user.decorator';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  @UseGuards(AuthGuard)
+  create(
+    @Body() createTransactionDto: CreateTransactionDto,
+    @UserDecorator() user: UserPeticion,
+  ) {
+    return this.transactionsService.create(createTransactionDto, user);
   }
 
   @Get()

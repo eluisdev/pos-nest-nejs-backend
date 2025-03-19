@@ -9,11 +9,15 @@ import {
 import { Product } from '../products/entities/product.entity';
 import { CouponsModule } from '../coupons/coupons.module';
 import { User } from 'src/user/entities/user.entity';
+import { AuthModule } from 'src/auth/auth.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Transaction, TransactionContents, Product, User]),
     CouponsModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [TransactionsController],
   providers: [TransactionsService],

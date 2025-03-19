@@ -23,3 +23,5 @@ export class User {
   })
   transactions: Transaction[];
 }
+
+export type UserPeticion = Pick<User, 'id' | 'email' | 'name' | 'rol'>;
